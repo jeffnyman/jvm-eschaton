@@ -1,0 +1,104 @@
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'com.testerstories.textadv.Voxam'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    jcenter()
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-simple:1.7.21'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.testng:testng:6.9.13.6'
+    testCompile 'org.assertj:assertj-core:3.5.2'
+}
+
+task buildLibrary(type: Copy) {
+    description 'Builds Voxam with JAR dependencies available'
+    from configurations.runtime
+    into "$buildDir/libs"
+}
+
+task testNG(type: Test) {
+    useTestNG()
+
+    afterSuite { desc, result ->
+        testOutput('testng', desc, result)
+    }
+}
+
+task aggregateTestReports(type: TestReport) {
+    destinationDir = file("$buildDir/reports/allTests")
+    reportOn test, testNG
+    doLast {
+        println('\nAggregate Test Reports')
+        println('Check for aggregate report at build/reports/allTests/index.html\n')
+    }
+}
+
+task wrapper(type: Wrapper) {
+    description 'Generates the Gradle wrapper scripts'
+    gradleVersion = '3.1'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': "$mainClassName"
+    }
+
+    from files(sourceSets.main.output.classesDir)
+    from configurations.runtime.asFileTree.files.collect { zipTree(it) }
+}
+
+build.dependsOn buildLibrary
+check.dependsOn aggregateTestReports
+
+run {
+    standardInput = System.in
+
+    if ( project.hasProperty('voxamInput') )
+        args = [project.voxamInput]
+
+    systemProperties System.getProperties()
+}
+
+test {
+    testLogging {
+        exceptionFormat = 'full'
+        events = ['skipped', 'failed']
+    }
+
+    outputs.upToDateWhen { return false }
+
+    afterSuite { desc, result ->
+        testOutput('junit', desc, result)
+    }
+
+    return void
+}
+
+def testOutput(type, desc, result) {
+    if (desc && !desc.parent) {
+        def output = "Results: ${result.resultType} (${result.testCount} tests, "
+        output += "${result.successfulTestCount} passed, ${result.failedTestCount} failed, "
+        output += "${result.skippedTestCount} skipped)"
+        def startItem = '|  ', endItem = '  |'
+        def repeatLength = startItem.length() + output.length() + endItem.length()
+        println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+
+        switch(type) {
+            case 'junit':
+                println('Check for JUnit report at build/reports/tests/test/index.html\n')
+                break
+            case 'testng':
+                println('Check for TestNG report at build/reports/tests/testNG/index.html\n')
+                break
+        }
+    }
+}
