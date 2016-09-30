@@ -18,6 +18,14 @@ dependencies {
     testCompile 'org.testng:testng:6.9.13.6'
     testCompile 'io.github.j8spec:j8spec:3.0.0'
     testCompile 'org.assertj:assertj-core:3.5.2'
+    testCompile 'info.cukes:cucumber-junit:1.2.5'
+    testCompile 'info.cukes:cucumber-java8:1.2.5'
+}
+
+project.configurations {
+    cucumberRuntime {
+        extendsFrom testRuntime
+    }
 }
 
 task buildLibrary(type: Copy) {
@@ -40,6 +48,17 @@ task aggregateTestReports(type: TestReport) {
     doLast {
         println('\nAggregate Test Reports')
         println('Check for aggregate report at build/reports/allTests/index.html\n')
+    }
+}
+
+task cucumber() {
+    dependsOn assemble, compileTestJava
+    doLast {
+        javaexec {
+            main = "cucumber.api.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--glue', 'com.testerstories.textadv', 'src/test/resources']
+        }
     }
 }
 
