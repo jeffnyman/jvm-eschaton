@@ -16,6 +16,8 @@ You can also run all tests together and get an aggregate report:
 
 The tests are not fully replicated in both types of test library. The TestNG test adds a way to conceptualize test conditions by providing data in a way that may make understanding what is being tested and why more clear. This is a theme that is important to consider because you are considering the level of abstraction and the mode of expression that you are using for tests.
 
+The `ParserSpecTest` is an example of trying a specification-based approach to the test expression. These tests are run via the JUnit runner and, as such, are reported as part of its execution. Like the TestNG set, this set of tests is currently not as fleshed out as the pure JUnit tests in `ParserTest` because the goal here is to show another method of expression.
+
 Keep in mind a key point: it's possible to have incredibly terrible code and yet still have good code coverage of it. Having tests, particularly if they did not drive your design, can give a false sense of confidence of some key aspects of quality: discoverability, maintainability, extensibility and so on.
 
 But can you use the tests to draw conclusions?

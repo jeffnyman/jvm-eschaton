@@ -16,6 +16,7 @@ dependencies {
     compile 'org.slf4j:slf4j-simple:1.7.21'
     testCompile 'junit:junit:4.12'
     testCompile 'org.testng:testng:6.9.13.6'
+    testCompile 'io.github.j8spec:j8spec:3.0.0'
     testCompile 'org.assertj:assertj-core:3.5.2'
 }
 
