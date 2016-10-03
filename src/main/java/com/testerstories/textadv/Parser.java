@@ -24,30 +24,9 @@ class Parser {
     Action parse(String playerInput) {
         action = new Action();
 
-        // Stop parsing if null input.
-        if (playerInput == null) {
-            action.setMessage("Failed");
-            return action;
-        }
-
-        // Remove leading and trailing whitespace.
-        playerInput = playerInput.trim();
-
-        // ###################################################################
-        // NOTE: I'm not sure if this is needed. The idea is to make sure
-        // I have a reference to the original at all times.
-        // ###################################################################
-        String input = playerInput;
-
-        // Remove trailing punctuation.
-        while (input.length() > 0 &&
-                !Character.isLetter(input.charAt(input.length() - 1))) {
-            input = input.substring(0, input.length() -1);
-        }
-
-        // Empty commands should not be processed.
-        if (input.equals("")) {
-            action.setMessage("Failed");
+        String input = validateInput(playerInput);
+        if (input.startsWith("FAILED:")) {
+            action.setMessage(input);
             return action;
         }
 
@@ -309,6 +288,29 @@ class Parser {
         }
 
         return article;
+    }
+
+    private String validateInput(String input) {
+        // Stop parsing if null input.
+        if (input == null) {
+            return "FAILED: No action was found.";
+        }
+
+        // Remove leading and trailing whitespace.
+        input = input.trim();
+
+        // Remove trailing punctuation.
+        while (input.length() > 0 &&
+                !Character.isLetter(input.charAt(input.length() - 1))) {
+            input = input.substring(0, input.length() -1);
+        }
+
+        // Empty commands should not be processed.
+        if (input.equals("")) {
+            return "FAILED: The action was empty.";
+        }
+
+        return input;
     }
 
     /**
