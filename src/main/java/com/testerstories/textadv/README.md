@@ -8,17 +8,17 @@ The basic idea of such an engine is that it contains a parser. An "action", in t
 
 ### Parser
 
-Take a moment and bask in how awful the code in the `Parser` class is.
+Take a moment and bask in how awful the code in the `Parser` class is. At least it's better than the code in the `ParserOriginal` class. They are both functionally equivalent, served by the same tests but with differents levels of design pressure brought to bear.
 
-Awful it may be, but this is how most projects seem to start off. Perhaps not so obviously as this, but the overall point is valid. The problem is that our projects don't just start off like this. They persist like this. And, eventually, they end like this.
+Awful as that code may be, this is how most projects seem to start off. Perhaps not so obviously as this, but the overall point is valid. The problem is that our projects don't just start off like this. They persist like this. And, eventually, they end like this.
 
-What you have here is essentially a very imperative program. The tests, however, aren't half-bad. In fact, they show that the parser is actually fairly good at its job.
+What you have here is essentially a very imperative program. That's certainly the case with `ParserOriginal`. And while `Parser` is slightly more modular, it still leaves a lot to be desired. The tests, however, aren't half-bad. In fact, they show that the parser is actually fairly good at its job.
 
 Speaking to the parser code, you'll see variables introduced all over the place. You'll also see comments sprinkled throughout the code. Some are more helpful than others, but it can be very hard to build up a decent picture of exactly how this parser works. And note that this is the case even with the unit tests. I know _what_ commands will be parsed but it would take a bit of work to extend this parser in any meaningful way.
 
-For example, can you easily tell that there is a fairly massive bit of duplication in place? Lines 145 to 193 are strikingly similar, in fact functionally identical, to lines 335 to 381. The `parse` method itself is much too large and full of conditionals to be adequately analyzed as part of a data flow algorithm.
+For example, can you easily tell that there is a fairly massive bit of duplication in place in `ParserOriginal`? Lines 145 to 193 are strikingly similar, in fact functionally identical, to lines 335 to 381. The `parse` method itself is much too large and full of conditionals to be adequately analyzed as part of a data flow algorithm. All of this has been fixed in `Parser`.
 
-But, again, the tests don't really provide any warnings of this. Why not? Because those tests, good as they might look and effective as they might be, never put pressure on design.
+But, again, the tests don't really provide any warnings of the problems we now know about. And those tests probably don't provide any warnings for the problems we _don't_ known about. But why not? Because those tests, good as they might look and effective as they might be, never put pressure on design. Or, at least, never did so in a very effective way.
 
 #### Building the Project
 

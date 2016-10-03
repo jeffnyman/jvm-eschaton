@@ -261,9 +261,7 @@ public class JUnitParserTest {
         assertThat(action.getIndirectObject()).isEqualTo("shovel");
     }
 
-    /*
-    @Test
-    public void handleReveredDirectAndIndirectObjects() {
+    public void transitive_verb_with_reversed_direct_and_indirect_objects() {
         action = parser.parse("feed the hungry cat a tasty treat");
         assertThat(action.getVerb()).isEqualTo("feed");
         assertThat(action.getDirectObjectArticles()).isEqualTo("a");
@@ -279,6 +277,12 @@ public class JUnitParserTest {
         assertThat(action.getDirectObjectArticles()).isEqualTo("the");
         assertThat(action.getIndirectObject()).isEqualTo("floyd");
 
+        action = parser.parse("give the lantern to floyd");
+        assertThat(action.getVerb()).isEqualTo("give");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern");
+        assertThat(action.getDirectObjectArticles()).isEqualTo("the");
+        assertThat(action.getIndirectObject()).isEqualTo("floyd");
+
         action = parser.parse("floyd, give me the lantern");
         assertThat(action.getCommandTarget()).isEqualTo("floyd");
         assertThat(action.getVerb()).isEqualTo("give");
@@ -286,9 +290,13 @@ public class JUnitParserTest {
         assertThat(action.getDirectObjects()).isEqualTo("lantern");
         assertThat(action.getIndirectObject()).isEqualTo("me");
 
-        // give the lantern to floyd
-        // give floyd the lantern
-        // floyd, give the lantern to me
+        action = parser.parse("floyd, give the lantern to me");
+        assertThat(action.getCommandTarget()).isEqualTo("floyd");
+        assertThat(action.getVerb()).isEqualTo("give");
+        assertThat(action.getDirectObjectArticles()).isEqualTo("the");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern");
+        assertThat(action.getPreposition()).isEqualTo("to");
+        assertThat(action.getIndirectObject()).isEqualTo("me");
 
         action = parser.parse("give floyd the brass lantern, the tasty smelly food, and the brass oversized duplicate skeleton key");
         assertThat(action.getVerb()).isEqualTo("give");
@@ -296,7 +304,7 @@ public class JUnitParserTest {
         assertThat(action.getDirectObjectModifiers()).isEqualTo("brass tasty smelly brass oversized duplicate skeleton");
         assertThat(action.getDirectObjects()).isEqualTo("lantern food key");
         assertThat(action.getIndirectObject()).isEqualTo("floyd");
-    }*/
+    }
 
     @Test
     public void handleMissingAction() {

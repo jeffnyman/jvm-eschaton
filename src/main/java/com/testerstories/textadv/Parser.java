@@ -31,7 +31,6 @@ class Parser {
         }
 
         LOG.debug("Action: " + input);
-        System.out.println("\nACTION: " + input + "\n");
 
         // Must check for command targets before verbs.
 
@@ -39,35 +38,24 @@ class Parser {
 
         if (commandTarget != null) {
             input = stripFirstWord(input);
-            LOG.debug("Command Target: " + commandTarget);
-            System.out.println("COMMAND: " + commandTarget);
+            LOG.debug("COMMAND: " + commandTarget);
             action.setCommandTarget(commandTarget);
         }
 
         LOG.debug("--- playerInput after CommandTarget: " + input);
 
-        // AT THIS POINT: input contains the original action, minus the
-        // command target if there was any.
-
-        // NOTE: If a command like "floyd," is entered, it might be thought
-        // that the verb has to be checked to see if it's null. But that's
-        // not the case because all punctuation is stripped from the end of
-        // of command. So the above situation would treat "floyd" as the
-        // verb.
-        // DESIGN: Does this mean the comma should be ruled out of the
-        // remove trailing punctuation? If that was the case, the parseVerb
-        // would need to check for an "input" that was empty or null.
+        // At this point, the input contains the original action, minus
+        // the command target if there was any.
 
         String verb = parseVerb(input);
 
         if (verb != null) {
             input = stripFirstWord(input);
-            LOG.debug("Verb: " + verb);
-            System.out.println("VERB: " + verb);
+            LOG.debug("VERB: " + verb);
             action.setVerb(verb);
         }
 
-        // AT THIS POINT: input contains the original action, minus the
+        // At this point, input contains the original action, minus the
         // verb.
 
         LOG.debug("--- playerInput after Verb: " + input);
@@ -85,13 +73,13 @@ class Parser {
             String directObject = stringBeforeWord(input, preposition);
             String indirectObject = stringAfterWord(input, preposition);
 
-            System.out.println("--- directObject: " + directObject);
-            System.out.println("--- indirectObject: " + indirectObject);
+            LOG.debug("--- directObject: " + directObject);
+            LOG.debug("--- indirectObject: " + indirectObject);
 
-            determineObjectPhrase(directObject, "direct");
-            determineObjectPhrase(indirectObject, "indirect");
+            determineObjectPhrase(directObject, "direct", false);
+            determineObjectPhrase(indirectObject, "indirect", false);
         } else {
-            determineObjectPhrase(input, "direct");
+            determineObjectPhrase(input, "direct", true);
         }
 
         // By this point, all that can be done with parsing the action
@@ -112,12 +100,18 @@ class Parser {
      *
      * @param input the action string to parse
      * @param phraseType the type of object phrase ("direct" or "indirect")
+     * @param precedingIndirect true if checking for indirect object preceding the direct object
      */
-    private void determineObjectPhrase(String input, String phraseType) {
+    private void determineObjectPhrase(String input, String phraseType, boolean precedingIndirect) {
         // Holds the original input initially but will be used to keep
         // track of the portion of the input remaining after any given
         // object phrase has been handled.
         String remaining = input;
+
+        // This is being done to hold the original value passed in because
+        // this will be set to false once the preceding indirect object
+        // phrase has been checked for and handled.
+        boolean precedingIndirectObjectPhrase = precedingIndirect;
 
         while (!remaining.equals("")) {
             // As long as there is some part of the original input, keep
@@ -168,6 +162,12 @@ class Parser {
 
             String objectPhrase = parseObjectPhrase(currentPhrase, phraseType);
 
+            if (precedingIndirectObjectPhrase) {
+                parseObjectPhrase(objectPhrase, "indirect");
+
+                precedingIndirectObjectPhrase = false;
+            }
+
             LOG.debug("--- Object Phrase (remaining): " + objectPhrase);
         }
     }
@@ -197,8 +197,7 @@ class Parser {
         String article = parseArticle(input);
 
         if (article != null) {
-            LOG.debug("ARTICLE: " + article);
-            System.out.println("(" + phraseType + ") ARTICLE: " + article);
+            LOG.debug("(" + phraseType + ") ARTICLE: " + article);
 
             if (phraseType.equals("direct")) {
                 action.setDirectObjectArticle(article);
@@ -215,8 +214,7 @@ class Parser {
         String object = parseObject(input);
 
         if (object != null) {
-            LOG.debug("OBJECT: " + object);
-            System.out.println("(" + phraseType + ") OBJECT: " + object);
+            LOG.debug("(" + phraseType + ") OBJECT: " + object);
 
             if (phraseType.equals("direct")) {
                 action.setDirectObject(object);
@@ -236,8 +234,7 @@ class Parser {
 
         while (st.hasMoreTokens()) {
             modifier = st.nextToken();
-            LOG.debug("MODIFIER: " + modifier);
-            System.out.println("(" + phraseType + ") MODIFIER: " + modifier);
+            LOG.debug("(" + phraseType + ") MODIFIER: " + modifier);
 
             if (phraseType.equals("direct")) {
                 action.setDirectObjectModifier(modifier);

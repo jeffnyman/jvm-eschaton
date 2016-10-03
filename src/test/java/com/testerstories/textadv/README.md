@@ -28,7 +28,6 @@ This will solely run the Cucumber runner (`CukeRunner`). This is yet another exa
 
 ### Test Insight
 
-
 Keep in mind a key point: it's possible to have incredibly terrible code and yet still have good code coverage of it. Having tests, particularly if they did not drive your design, can give a false sense of confidence of some key aspects of quality: discoverability, maintainability, extensibility and so on.
 
 But can you use the tests to draw conclusions?
