@@ -13,7 +13,9 @@ class Action {
     private String commandTarget;
     private String verb;
     private String message;
-    private String directObjectArticle;
+
+    //private String directObjectArticle;
+    private ArrayList<String> directObjectArticlesList = new ArrayList<>();
     private ArrayList<String> directObjectModifiersList = new ArrayList<>();
     private ArrayList<String> indirectObjectModifiersList = new ArrayList<>();
 
@@ -39,7 +41,7 @@ class Action {
         this.verb = verb;
     }
 
-    String getDirectObject() {
+    String getDirectObjects() {
         return String.join(" ", directObjects);
     }
 
@@ -56,15 +58,15 @@ class Action {
     }
 
     void setDirectObjectArticle(String directObjectArticle) {
-        this.directObjectArticle = directObjectArticle;
+        directObjectArticlesList.add(directObjectArticle);
     }
 
-    String getDirectObjectArticle() {
-        return directObjectArticle;
+    String getDirectObjectArticles() {
+        return String.join(" ", directObjectArticlesList);
     }
 
-    void setDirectObjectModifiers(String directObjectModifiers) {
-        directObjectModifiersList.add(directObjectModifiers);
+    void setDirectObjectModifier(String directObjectModifier) {
+        directObjectModifiersList.add(directObjectModifier);
     }
 
     String getDirectObjectModifiers() {

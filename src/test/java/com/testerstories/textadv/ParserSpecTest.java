@@ -9,11 +9,11 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(J8SpecRunner.class)
 public class ParserSpecTest {
-    private Parser parser;
+    private ParserOriginal parser;
     private Action action;
 
     {
-        beforeEach(() -> parser = new Parser());
+        beforeEach(() -> parser = new ParserOriginal());
 
         afterEach(() -> parser = null);
 
@@ -29,29 +29,29 @@ public class ParserSpecTest {
                 it("action with verb and direct object", () -> {
                     action = parser.parse("take lantern");
                     assertThat(action.getVerb(), is("take"));
-                    assertThat(action.getDirectObject(), is("lantern"));
+                    assertThat(action.getDirectObjects(), is("lantern"));
                 });
 
                 it("action with verb and a direct object that has an article", () -> {
                     action = parser.parse("take the lantern");
                     assertThat(action.getVerb(), is("take"));
-                    assertThat(action.getDirectObjectArticle(), is("the"));
-                    assertThat(action.getDirectObject(), is("lantern"));
+                    assertThat(action.getDirectObjectArticles(), is("the"));
+                    assertThat(action.getDirectObjects(), is("lantern"));
                 });
 
                 it("action with verb and a direct object that has a modifier", () -> {
                     action = parser.parse("take brass lantern");
                     assertThat(action.getVerb(), is("take"));
                     assertThat(action.getDirectObjectModifiers(), is("brass"));
-                    assertThat(action.getDirectObject(), is("lantern"));
+                    assertThat(action.getDirectObjects(), is("lantern"));
                 });
 
                 it("action with verb and a direct object that has an article and modifier", () -> {
                     action = parser.parse("take the brass lantern");
                     assertThat(action.getVerb(), is("take"));
-                    assertThat(action.getDirectObjectArticle(), is("the"));
+                    assertThat(action.getDirectObjectArticles(), is("the"));
                     assertThat(action.getDirectObjectModifiers(), is("brass"));
-                    assertThat(action.getDirectObject(), is("lantern"));
+                    assertThat(action.getDirectObjects(), is("lantern"));
                 });
             });
         });

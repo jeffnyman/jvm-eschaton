@@ -5,12 +5,12 @@ import cucumber.api.java8.En;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ParserSteps implements En {
-    private Parser parser;
+    private ParserOriginal parser;
     private Action action;
 
     public ParserSteps() {
         Given("^the parser$", () -> {
-            parser = new Parser();
+            parser = new ParserOriginal();
         });
 
         When("^the action \"([^\"]*)\" is parsed$", (String input) -> {
@@ -22,11 +22,11 @@ public class ParserSteps implements En {
         });
 
         Then("^the direct object is recognized as \"([^\"]*)\"$", (String directObject) -> {
-            assertThat(action.getDirectObject()).isEqualTo(directObject);
+            assertThat(action.getDirectObjects()).isEqualTo(directObject);
         });
 
         Then("^the direct object article is recognized as \"([^\"]*)\"$", (String directObjectArticle) -> {
-            assertThat(action.getDirectObjectArticle()).isEqualTo(directObjectArticle);
+            assertThat(action.getDirectObjectArticles()).isEqualTo(directObjectArticle);
         });
 
         Then("^the direct object modifier is recognized as \"([^\"]*)\"$", (String directObjectModifier) -> {

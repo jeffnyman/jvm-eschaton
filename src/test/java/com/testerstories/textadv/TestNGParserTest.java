@@ -8,11 +8,11 @@ import org.testng.annotations.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestNGParserTest {
-    private Parser parser;
+    private ParserOriginal parser;
 
     @BeforeMethod
     public void setUp() {
-        parser = new Parser();
+        parser = new ParserOriginal();
     }
 
     @AfterMethod
@@ -36,7 +36,7 @@ public class TestNGParserTest {
         Action action = parser.parse(input);
         assertThat(action.getCommandTarget()).isEqualTo(target);
         assertThat(action.getVerb()).isEqualTo(verb);
-        assertThat(action.getDirectObject()).isEqualTo(directObject);
+        assertThat(action.getDirectObjects()).isEqualTo(directObject);
         assertThat(action.getIndirectObject()).isEqualTo(indirectObject);
         assertThat(action.getMessage()).isEqualTo("Success");
     }
