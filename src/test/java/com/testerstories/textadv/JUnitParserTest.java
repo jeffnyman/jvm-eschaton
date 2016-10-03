@@ -22,7 +22,7 @@ public class JUnitParserTest {
     }
 
     @Test
-    public void handleIntransitiveVerb() {
+    public void intransitive_verb() {
         action = parser.parse("inventory");
         assertThat(action.getVerb()).isEqualTo("inventory");
         assertThat(action.getDirectObjects()).isEqualTo("");
@@ -30,7 +30,7 @@ public class JUnitParserTest {
     }
 
     @Test
-    public void handleTransitiveVerb() {
+    public void transitive_verb() {
         action = parser.parse("take lantern");
         assertThat(action.getVerb()).isEqualTo("take");
         assertThat(action.getDirectObjects()).isEqualTo("lantern");
@@ -38,7 +38,7 @@ public class JUnitParserTest {
     }
 
     @Test
-    public void handleTransitiveVerbWithArticle() {
+    public void transitive_verb_with_article() {
         action = parser.parse("take the lantern");
         assertThat(action.getVerb()).isEqualTo("take");
         assertThat(action.getDirectObjects()).isEqualTo("lantern");
@@ -47,7 +47,7 @@ public class JUnitParserTest {
     }
 
     @Test
-    public void handleTransitiveVerbWithModifier() {
+    public void transitive_verb_with_modifier() {
         action = parser.parse("take brass lantern");
         assertThat(action.getVerb()).isEqualTo("take");
         assertThat(action.getDirectObjects()).isEqualTo("lantern");
@@ -56,7 +56,7 @@ public class JUnitParserTest {
     }
 
     @Test
-    public void handleTransitiveVerbWithArticleAndModifier() {
+    public void transitive_verb_with_article_and_modifier() {
         action = parser.parse("take the brass lantern");
         assertThat(action.getVerb()).isEqualTo("take");
         assertThat(action.getDirectObjects()).isEqualTo("lantern");
@@ -66,7 +66,16 @@ public class JUnitParserTest {
     }
 
     @Test
-    public void handleTransitiveVerbWithMultipleModifiers() {
+    public void transitive_verb_with_multiple_modifiers() {
+        action = parser.parse("take heavy brass lantern");
+        assertThat(action.getVerb()).isEqualTo("take");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern");
+        assertThat(action.getDirectObjectModifiers()).isEqualTo("heavy brass");
+        assertThat(action.getMessage()).isEqualTo("Success");
+    }
+
+    @Test
+    public void transitive_verb_with_article_and_multiple_modifiers() {
         action = parser.parse("take the heavy brass lantern");
         assertThat(action.getVerb()).isEqualTo("take");
         assertThat(action.getDirectObjects()).isEqualTo("lantern");
@@ -76,7 +85,95 @@ public class JUnitParserTest {
     }
 
     @Test
-    public void handleIntransitiveVerbCommand() {
+    public void transitive_verb_with_two_direct_objects_using_and() {
+        action = parser.parse("take lantern and shovel");
+        assertThat(action.getVerb()).isEqualTo("take");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern shovel");
+        assertThat(action.getMessage()).isEqualTo("Success");
+    }
+
+    @Test
+    public void transitive_verb_with_articles_with_two_direct_objects_using_and() {
+        action = parser.parse("take lantern and the shovel");
+        assertThat(action.getVerb()).isEqualTo("take");
+        assertThat(action.getDirectObjectArticles()).isEqualTo("the");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern shovel");
+        assertThat(action.getMessage()).isEqualTo("Success");
+
+        action = parser.parse("take the lantern and shovel");
+        assertThat(action.getDirectObjectArticles()).isEqualTo("the");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern shovel");
+        assertThat(action.getMessage()).isEqualTo("Success");
+
+        action = parser.parse("take the lantern and the shovel");
+        assertThat(action.getVerb()).isEqualTo("take");
+        assertThat(action.getDirectObjectArticles()).isEqualTo("the the");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern shovel");
+        assertThat(action.getMessage()).isEqualTo("Success");
+
+        action = parser.parse("take the lantern and a shovel");
+        assertThat(action.getVerb()).isEqualTo("take");
+        assertThat(action.getDirectObjectArticles()).isEqualTo("the a");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern shovel");
+        assertThat(action.getMessage()).isEqualTo("Success");
+    }
+
+    @Test
+    public void transitive_verb_with_articles_and_modifiers_with_two_direct_objects_using_and() {
+        action = parser.parse("take the brass lantern and the sturdy shovel");
+        assertThat(action.getVerb()).isEqualTo("take");
+        assertThat(action.getDirectObjectArticles()).isEqualTo("the the");
+        assertThat(action.getDirectObjectModifiers()).isEqualTo("brass sturdy");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern shovel");
+        assertThat(action.getMessage()).isEqualTo("Success");
+    }
+
+    @Test
+    public void transitive_verb_with_more_than_two_direct_objects_using_and() {
+        action = parser.parse("take lantern and shovel and key");
+        assertThat(action.getVerb()).isEqualTo("take");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern shovel key");
+        assertThat(action.getMessage()).isEqualTo("Success");
+
+        action = parser.parse("get the brass lantern and the tasty food and the key");
+        assertThat(action.getVerb()).isEqualTo("get");
+        assertThat(action.getDirectObjectModifiers()).isEqualTo("brass tasty");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern food key");
+    }
+
+    @Test
+    public void transitive_verb_with_two_direct_objects_using_comma() {
+        action = parser.parse("take lantern, shovel");
+        assertThat(action.getVerb()).isEqualTo("take");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern shovel");
+        assertThat(action.getMessage()).isEqualTo("Success");
+    }
+
+    @Test
+    public void transitive_verb_with_articles_with_two_direct_objects_using_comma() {
+        action = parser.parse("take the lantern, a shovel");
+        assertThat(action.getVerb()).isEqualTo("take");
+        assertThat(action.getDirectObjectArticles()).isEqualTo("the a");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern shovel");
+        assertThat(action.getMessage()).isEqualTo("Success");
+    }
+
+    @Test
+    public void transitive_verb_with_more_than_two_direct_objects_using_comma() {
+        action = parser.parse("take lantern, shovel, key");
+        assertThat(action.getVerb()).isEqualTo("take");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern shovel key");
+        assertThat(action.getMessage()).isEqualTo("Success");
+
+        action = parser.parse("take the lantern, the shovel, the key");
+        assertThat(action.getVerb()).isEqualTo("take");
+        assertThat(action.getDirectObjectArticles()).isEqualTo("the the the");
+        assertThat(action.getDirectObjects()).isEqualTo("lantern shovel key");
+        assertThat(action.getMessage()).isEqualTo("Success");
+    }
+
+    @Test
+    public void command_with_intransitive_v() {
         action = parser.parse("floyd, run");
         assertThat(action.getCommandTarget()).isEqualTo("floyd");
         assertThat(action.getVerb()).isEqualTo("run");
@@ -85,7 +182,7 @@ public class JUnitParserTest {
     }
 
     @Test
-    public void handleTransitiveVerbCommand() {
+    public void command_with_transitive_verb() {
         action = parser.parse("floyd, take lantern");
         assertThat(action.getCommandTarget()).isEqualTo("floyd");
         assertThat(action.getVerb()).isEqualTo("take");
@@ -94,7 +191,7 @@ public class JUnitParserTest {
     }
 
     @Test
-    public void handleTransitiveVerbWithArticleCommand() {
+    public void command_with_transitive_verb_and_article() {
         action = parser.parse("floyd, take the lantern");
         assertThat(action.getCommandTarget()).isEqualTo("floyd");
         assertThat(action.getVerb()).isEqualTo("take");
@@ -104,7 +201,7 @@ public class JUnitParserTest {
     }
 
     @Test
-    public void handleTransitiveVerbWithModifierCommand() {
+    public void command_with_transitive_verb_and_modifier() {
         action = parser.parse("floyd, take brass lantern");
         assertThat(action.getCommandTarget()).isEqualTo("floyd");
         assertThat(action.getVerb()).isEqualTo("take");
@@ -114,7 +211,7 @@ public class JUnitParserTest {
     }
 
     @Test
-    public void handleTransitiveVerbWithArticleAndModifierCommand() {
+    public void command_with_transitive_verb_with_article_and_modifier() {
         action = parser.parse("floyd, take the brass lantern");
         assertThat(action.getCommandTarget()).isEqualTo("floyd");
         assertThat(action.getVerb()).isEqualTo("take");
@@ -125,97 +222,46 @@ public class JUnitParserTest {
     }
 
     @Test
-    public void handleTransitiveVerbWithIndirectObject() {
-        action = parser.parse("take lantern with gloves");
-        assertThat(action.getVerb()).isEqualTo("take");
-        assertThat(action.getDirectObjects()).isEqualTo("lantern");
+    public void transitive_verb_with_indirect_object() {
+        action = parser.parse("dig hole with shovel");
+        assertThat(action.getVerb()).isEqualTo("dig");
+        assertThat(action.getDirectObjects()).isEqualTo("hole");
         assertThat(action.getPreposition()).isEqualTo("with");
-        assertThat(action.getIndirectObject()).isEqualTo("gloves");
+        assertThat(action.getIndirectObject()).isEqualTo("shovel");
     }
 
     @Test
-    public void handleTransitiveVerbWithIndirectObjectAndArticle() {
-        action = parser.parse("take lantern with the gloves");
-        assertThat(action.getVerb()).isEqualTo("take");
-        assertThat(action.getDirectObjects()).isEqualTo("lantern");
+    public void transitive_verb_with_indirect_object_and_article() {
+        action = parser.parse("dig a hole with shovel");
+        assertThat(action.getVerb()).isEqualTo("dig");
+        assertThat(action.getDirectObjectArticles()).isEqualTo("a");
+        assertThat(action.getDirectObjects()).isEqualTo("hole");
         assertThat(action.getPreposition()).isEqualTo("with");
-        assertThat(action.getIndirectObjectArticle()).isEqualTo("the");
-        assertThat(action.getIndirectObject()).isEqualTo("gloves");
-    }
+        assertThat(action.getIndirectObject()).isEqualTo("shovel");
 
-    @Test
-    public void handleTransitiveVerbWithIndirectObjectAndModifiers() {
-        action = parser.parse("take lantern with the thick gloves");
-        assertThat(action.getVerb()).isEqualTo("take");
-        assertThat(action.getDirectObjects()).isEqualTo("lantern");
+        action = parser.parse("dig a hole with the shovel");
+        assertThat(action.getVerb()).isEqualTo("dig");
+        assertThat(action.getDirectObjectArticles()).isEqualTo("a");
+        assertThat(action.getDirectObjects()).isEqualTo("hole");
         assertThat(action.getPreposition()).isEqualTo("with");
         assertThat(action.getIndirectObjectArticle()).isEqualTo("the");
-        assertThat(action.getIndirectObjectModifiers()).isEqualTo("thick");
-        assertThat(action.getIndirectObject()).isEqualTo("gloves");
+        assertThat(action.getIndirectObject()).isEqualTo("shovel");
     }
 
     @Test
-    public void handleTransitiveVerbWithDirectAndIndirectArticles() {
-        action = parser.parse("put the lantern on the table");
-        assertThat(action.getVerb()).isEqualTo("put");
-        assertThat(action.getDirectObjects()).isEqualTo("lantern");
-        assertThat(action.getDirectObjectArticles()).isEqualTo("the");
-        assertThat(action.getPreposition()).isEqualTo("on");
+    public void transitive_verb_with_indirect_object_with_articles_and_modifiers() {
+        action = parser.parse("dig a big hole with the sturdy shovel");
+        assertThat(action.getVerb()).isEqualTo("dig");
+        assertThat(action.getDirectObjectArticles()).isEqualTo("a");
+        assertThat(action.getDirectObjectModifiers()).isEqualTo("big");
+        assertThat(action.getDirectObjects()).isEqualTo("hole");
+        assertThat(action.getPreposition()).isEqualTo("with");
         assertThat(action.getIndirectObjectArticle()).isEqualTo("the");
-        assertThat(action.getIndirectObject()).isEqualTo("table");
+        assertThat(action.getIndirectObjectModifiers()).isEqualTo("sturdy");
+        assertThat(action.getIndirectObject()).isEqualTo("shovel");
     }
 
-    @Test
-    public void handleTransitiveVerbWithArticlesAndModifiers() {
-        action = parser.parse("put the brass lantern on the wooden table");
-        assertThat(action.getVerb()).isEqualTo("put");
-        assertThat(action.getDirectObjects()).isEqualTo("lantern");
-        assertThat(action.getDirectObjectArticles()).isEqualTo("the");
-        assertThat(action.getDirectObjectModifiers()).isEqualTo("brass");
-        assertThat(action.getPreposition()).isEqualTo("on");
-        assertThat(action.getIndirectObjectArticle()).isEqualTo("the");
-        assertThat(action.getIndirectObjectModifiers()).isEqualTo("wooden");
-        assertThat(action.getIndirectObject()).isEqualTo("table");
-    }
-
-    @Test
-    public void handleTransitiveVerbWithMultipleDirectObjects() {
-        action = parser.parse("get lantern and key");
-        assertThat(action.getVerb()).isEqualTo("get");
-        assertThat(action.getDirectObjects()).isEqualTo("lantern key");
-
-        action = parser.parse("get lantern, food, key");
-        assertThat(action.getVerb()).isEqualTo("get");
-        assertThat(action.getDirectObjects()).isEqualTo("lantern food key");
-
-        action = parser.parse("get the lantern, the tasty food, and key");
-        assertThat(action.getVerb()).isEqualTo("get");
-        assertThat(action.getDirectObjectModifiers()).isEqualTo("tasty");
-        assertThat(action.getDirectObjects()).isEqualTo("lantern food key");
-    }
-
-    @Test
-    public void handleTransitiveVerbWithMultipleDirectObjectsSameArticles() {
-        action = parser.parse("get the lantern and the key");
-        assertThat(action.getVerb()).isEqualTo("get");
-        assertThat(action.getDirectObjects()).isEqualTo("lantern key");
-    }
-
-    @Test
-    public void handleTransitiveVerbWithMultipleDirectObjectsDifferentArticles() {
-        action = parser.parse("get the lantern and a key");
-        assertThat(action.getVerb()).isEqualTo("get");
-        assertThat(action.getDirectObjects()).isEqualTo("lantern key");
-    }
-
-    @Test
-    public void handleTransitiveVerbWithMultipleDirectObjectsAndModifiers() {
-        action = parser.parse("get the brass lantern and the tasty food and the key");
-        assertThat(action.getVerb()).isEqualTo("get");
-        assertThat(action.getDirectObjectModifiers()).isEqualTo("brass tasty");
-        assertThat(action.getDirectObjects()).isEqualTo("lantern food key");
-    }
-
+    /*
     @Test
     public void handleReveredDirectAndIndirectObjects() {
         action = parser.parse("feed the hungry cat a tasty treat");
@@ -240,13 +286,17 @@ public class JUnitParserTest {
         assertThat(action.getDirectObjects()).isEqualTo("lantern");
         assertThat(action.getIndirectObject()).isEqualTo("me");
 
+        // give the lantern to floyd
+        // give floyd the lantern
+        // floyd, give the lantern to me
+
         action = parser.parse("give floyd the brass lantern, the tasty smelly food, and the brass oversized duplicate skeleton key");
         assertThat(action.getVerb()).isEqualTo("give");
         assertThat(action.getDirectObjectArticles()).isEqualTo("the");
         assertThat(action.getDirectObjectModifiers()).isEqualTo("brass tasty smelly brass oversized duplicate skeleton");
         assertThat(action.getDirectObjects()).isEqualTo("lantern food key");
         assertThat(action.getIndirectObject()).isEqualTo("floyd");
-    }
+    }*/
 
     @Test
     public void handleMissingAction() {

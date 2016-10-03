@@ -36,12 +36,9 @@ public class Voxam {
         System.out.println("DO Article: " + action.getDirectObjectArticles());
         System.out.println("DO Modifier: " + action.getDirectObjectModifiers());
         System.out.println("Direct Objects: " + action.getDirectObjects());
-
-        /*
         System.out.println("Preposition: " + action.getPreposition());
-        System.out.println("Indirect Object (Article): " + action.getIndirectObjectArticle());
-        System.out.println("Indirect Object (Modifiers): " + action.getIndirectObjectModifiers());
+        System.out.println("IO Article: " + action.getIndirectObjectArticle());
+        System.out.println("IO Modifier: " + action.getIndirectObjectModifiers());
         System.out.println("Indirect Object: " + action.getIndirectObject());
-        */
     }
 }

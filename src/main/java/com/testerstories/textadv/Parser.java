@@ -31,7 +31,7 @@ class Parser {
         }
 
         LOG.debug("Action: " + input);
-        System.out.println("ACTION: " + input + "\n");
+        System.out.println("\nACTION: " + input + "\n");
 
         // Must check for command targets before verbs.
 
@@ -44,7 +44,7 @@ class Parser {
             action.setCommandTarget(commandTarget);
         }
 
-        System.out.println("--- playerInput after CommandTarget: " + input);
+        LOG.debug("--- playerInput after CommandTarget: " + input);
 
         // AT THIS POINT: input contains the original action, minus the
         // command target if there was any.
@@ -70,15 +70,29 @@ class Parser {
         // AT THIS POINT: input contains the original action, minus the
         // verb.
 
-        System.out.println("--- playerInput after Verb: " + input);
+        LOG.debug("--- playerInput after Verb: " + input);
 
-        // BUT: You can have intransitive verbs.
-        // NOW: Assuming a valid sentence structure, the parser has to
+        // Assuming a valid sentence structure, the parser has to
         // account for direct and indirect objects. One of the first
         // things to do is check for a preposition. An indirect object,
         // if one is present, will occur in a prepositional phrase.
 
-        determineObjectPhrase(input);
+        String preposition = parsePreposition(input);
+
+        if (preposition != null) {
+            action.setPreposition(preposition);
+
+            String directObject = stringBeforeWord(input, preposition);
+            String indirectObject = stringAfterWord(input, preposition);
+
+            System.out.println("--- directObject: " + directObject);
+            System.out.println("--- indirectObject: " + indirectObject);
+
+            determineObjectPhrase(directObject, "direct");
+            determineObjectPhrase(indirectObject, "indirect");
+        } else {
+            determineObjectPhrase(input, "direct");
+        }
 
         // By this point, all that can be done with parsing the action
         // has been done.
@@ -88,7 +102,18 @@ class Parser {
         return action;
     }
 
-    private void determineObjectPhrase(String input) {
+    /**
+     * Determine the object phrases that are present in an input string.
+     *
+     * The simplistic algorithm used in this method is to break up a phrase
+     * into smaller phrases. The smaller phrases can be separated from each
+     * other by "and" or ",". Any resulting smaller phrases are then parsed
+     * as simple object phrases.
+     *
+     * @param input the action string to parse
+     * @param phraseType the type of object phrase ("direct" or "indirect")
+     */
+    private void determineObjectPhrase(String input, String phraseType) {
         // Holds the original input initially but will be used to keep
         // track of the portion of the input remaining after any given
         // object phrase has been handled.
@@ -137,17 +162,33 @@ class Parser {
                 remaining = remaining.trim();
             }
 
-            System.out.println("*** input: " + input);
-            System.out.println("*** remaining: " + remaining);
-            System.out.println("*** current phrase: " + currentPhrase);
+            LOG.debug("*** input: " + input);
+            LOG.debug("*** remaining: " + remaining);
+            LOG.debug("*** current phrase: " + currentPhrase);
 
-            String objectPhrase = parseObjectPhrase(currentPhrase);
+            String objectPhrase = parseObjectPhrase(currentPhrase, phraseType);
 
-            System.out.println("--- Object Phrase (remaining): " + objectPhrase);
+            LOG.debug("--- Object Phrase (remaining): " + objectPhrase);
         }
     }
 
-    private String parseObjectPhrase(String input) {
+    /**
+     * This is used to parse any object phrase, which can contain a direct
+     * or indirect object. Each object phrase is checked for articles and
+     * modifiers.
+     *
+     * This method will return any unparsed string that was located before
+     * the first word of the object phrase. This unparsed string is likely
+     * the indirect object of the following kind of sentence construction
+     * (with no preposition):
+     *
+     * "|verb| indirect object phrase |direct object phrase|"
+     *
+     * @param input the object phrase to parse
+     * @param phraseType the type of object phrase ("direct" or "indirect")
+     * @return the unparsed portion of the phrase, if any
+     */
+    private String parseObjectPhrase(String input, String phraseType) {
         String originalInput = input;
 
         // The article, if present, will be the first word of the object
@@ -157,24 +198,36 @@ class Parser {
 
         if (article != null) {
             LOG.debug("ARTICLE: " + article);
-            System.out.println("ARTICLE: " + article);
-            action.setDirectObjectArticle(article);
+            System.out.println("(" + phraseType + ") ARTICLE: " + article);
+
+            if (phraseType.equals("direct")) {
+                action.setDirectObjectArticle(article);
+            } else if (phraseType.equals("indirect")) {
+                action.setIndirectObjectArticle(article);
+            }
+
             input = stringAfterWord(input, article);
         }
 
-        System.out.println("--- playerInput after Article: " + input);
+        LOG.debug("--- playerInput after Article: " + input);
 
         // The object is the last word of the object phrase.
         String object = parseObject(input);
 
         if (object != null) {
             LOG.debug("OBJECT: " + object);
-            System.out.println("OBJECT: " + object);
-            action.setDirectObject(object);
+            System.out.println("(" + phraseType + ") OBJECT: " + object);
+
+            if (phraseType.equals("direct")) {
+                action.setDirectObject(object);
+            } else if (phraseType.equals("indirect")) {
+                action.setIndirectObject(object);
+            }
+
             input = stringBeforeWord(input, object);
         }
 
-        System.out.println("--- playerInput after Object: " + input);
+        LOG.debug("--- playerInput after Object: " + input);
 
         // If any phrase bits remain at this point, they must all
         // be modifiers for the object.
@@ -184,8 +237,13 @@ class Parser {
         while (st.hasMoreTokens()) {
             modifier = st.nextToken();
             LOG.debug("MODIFIER: " + modifier);
-            System.out.println("MODIFIER: " + modifier);
-            action.setDirectObjectModifier(modifier);
+            System.out.println("(" + phraseType + ") MODIFIER: " + modifier);
+
+            if (phraseType.equals("direct")) {
+                action.setDirectObjectModifier(modifier);
+            } else if (phraseType.equals("indirect")) {
+                action.setIndirectObjectModifier(modifier);
+            }
         }
 
         // At this point it is necessary to return the unparsed portion of
@@ -193,17 +251,17 @@ class Parser {
         // overall input that was not yet handled.
 
         if (article != null) {
-            System.out.println("--- using first return condition");
+            LOG.debug("--- using first return condition");
             return stringBeforeWord(originalInput, article);
         }
 
         if (modifier != null) {
-        System.out.println("--- using second return condition");
+            LOG.debug("--- using second return condition");
             return stringBeforeWord(originalInput, modifier);
         }
 
         if (object != null) {
-            System.out.println("--- using third return condition");
+            LOG.debug("--- using third return condition");
             return stringBeforeWord(originalInput, object);
         }
 
@@ -290,6 +348,40 @@ class Parser {
         return article;
     }
 
+    /**
+     * Returns the preposition in a string.
+     *
+     * @param input the command string to parse
+     * @return the preposition portion of the action
+     */
+    private String parsePreposition(String input) {
+        StringTokenizer st = new StringTokenizer(input);
+        String preposition = null;
+        String prepositions = ":in:on:to:under:inside:outside:into:" +
+                "with:before:after:behind:beneath:through:onto:alongside:around:" +
+                "within:beyond:but:except:";
+
+        while (st.hasMoreTokens()) {
+            String word = st.nextToken();
+            String prepWord = ":" + word + ":";
+
+            if (prepositions.contains(prepWord)) {
+                preposition = word;
+                break;
+            }
+        }
+
+        return preposition;
+    }
+
+    /**
+     * Validates any player input to make sure the input is not null,
+     * has no leading or trailing whitespace, is not empty, and has
+     * no trailing punctuation.
+     *
+     * @param input the input string to validate
+     * @return a failed message if errors, the input string otherwise
+     */
     private String validateInput(String input) {
         // Stop parsing if null input.
         if (input == null) {
@@ -328,6 +420,14 @@ class Parser {
         return input.substring(index).trim();
     }
 
+    /**
+     * For a given string and a given word, return the part of the string
+     * that comes before the word.
+     *
+     * @param input the input string to parse
+     * @param word the word to look for in the string
+     * @return the portion of the input string before the word
+     */
     private String stringBeforeWord(String input, String word) {
         StringTokenizer st = new StringTokenizer(input);
         boolean pastWord = false;
@@ -346,6 +446,14 @@ class Parser {
         return firstPart.trim();
     }
 
+    /**
+     * For a given string and a given word, return the part of the string
+     * that comes after the word.
+     *
+     * @param input the input string to parse
+     * @param word the word to look for in the string
+     * @return the portion of the input string after the word
+     */
     private String stringAfterWord(String input, String word) {
         StringTokenizer st = new StringTokenizer(input);
         boolean pastWord = false;

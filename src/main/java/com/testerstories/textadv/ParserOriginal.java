@@ -179,7 +179,7 @@ class ParserOriginal {
 
                 for (phrase_index = phrase_bit; phrase_index < indirect_object_index; phrase_index++) {
                     LOG.debug(string_array[phrase_bit] + " ");
-                    action.setIndirectObjectModifiers(string_array[phrase_bit]);
+                    action.setIndirectObjectModifier(string_array[phrase_bit]);
                 }
                 LOG.debug("");
                 // THE NEXT LINE IS "EXTENDED"
@@ -368,7 +368,7 @@ class ParserOriginal {
                 LOG.debug("Indirect Object Modifiers: ");
                 for (phrase_index = phrase_bit; phrase_index < indirect_object_index; phrase_index++) {
                     LOG.debug(string_array[phrase_bit] + " ");
-                    action.setIndirectObjectModifiers(string_array[phrase_bit]);
+                    action.setIndirectObjectModifier(string_array[phrase_bit]);
                 }
                 LOG.debug("");
                 indirect_object_modifier_index = phrase_bit;

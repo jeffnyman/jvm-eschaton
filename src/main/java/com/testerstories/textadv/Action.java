@@ -97,8 +97,8 @@ class Action {
         return indirectObjectArticle;
     }
 
-    void setIndirectObjectModifiers(String indirectObjectModifiers) {
-        indirectObjectModifiersList.add(indirectObjectModifiers);
+    void setIndirectObjectModifier(String indirectObjectModifier) {
+        indirectObjectModifiersList.add(indirectObjectModifier);
     }
 
     String getIndirectObjectModifiers() {
